@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>نوفل برو 2026 | النظام المتكامل</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee; --secondary: #3f37c9; --accent: #f72585;
+            --bg: #f8f9fe; --card: #ffffff; --text: #2b2d42;
+            --success: #4cc9f0; --gold: #fee440;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text);
+            margin: 0; padding-bottom: 80px; -webkit-tap-highlight-color: transparent;
+        }
+
+        /* الهيدر */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; padding: 25px 20px; text-align: center;
+            border-radius: 0 0 30px 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* شاشة الدراسة */
+        #studyOverlay {
+            position: fixed; inset: 0; background: #000; z-index: 9999;
+            display: none; flex-direction: column; justify-content: center; align-items: center; color: white;
+        }
+        .timer-val { font-size: 5rem; font-weight: 800; color: var(--success); font-family: monospace; }
+
+        /* التنقل السفلي */
+        .nav-bar {
+            position: fixed; bottom: 0; left: 0; right: 0; background: white;
+            height: 65px; display: flex; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); z-index: 1000;
+        }
+        .nav-item {
+            flex: 1; border: none; background: none; color: #8d99ae;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.7rem;
+        }
+        .nav-item.active { color: var(--primary); font-weight: bold; }
+
+        /* الصفحات */
+        .page { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .card { background: white; border-radius: 20px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+
+        /* التقويم الشهري */
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: bold; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
+        .cal-day-label { font-size: 0.7rem; color: #64748b; font-weight: bold; }
+        .cal-date { 
+            aspect-ratio: 1; display: flex; items-center: center; justify-content: center; 
+            background: #edf2f4; border-radius: 10px; font-size: 0.8rem; cursor: pointer; align-items: center;
+        }
+        .cal-date.has-data { background: var(--primary); color: white; }
+
+        /* بطاقة المهام اليومية (مودال) */
+        #dayModal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 10001;
+            display: none; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-content { background: white; border-radius: 25px; width: 100%; max-width: 400px; padding: 20px; max-height: 80vh; overflow-y: auto; }
+
+        /* أزرار */
+        .btn { padding: 12px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; width: 100%; margin-top: 8px; }
+        .btn-main { background: var(--primary); color: white; }
+        .btn-pause { background: var(--gold); color: black; }
+        .btn-exit { background: var(--accent); color: white; }
+    </style>
+</head>
+<body>
+
+    <div id="studyOverlay">
+        <h2 id="currentSubName">المادة</h2>
+        <div class="timer-val" id="mainClock">00:00</div>
+        <div style="width: 80%; max-width: 300px; display: flex; flex-direction: column; gap: 10px;">
+            <button class="btn btn-pause" id="pauseBtn" onclick="togglePause()">إيقاف مؤقت ⏸</button>
+            <button class="btn btn-exit" onclick="emergencyExit()">خروج اضطراري 🏃</button>
+        </div>
+    </div>
+
+    <div class="app-header">
+        <h3 style="margin:0">منصة نوفل برو 2026</h3>
+        <div id="bacDays" style="font-size: 0.8rem; margin-top: 5px; background: rgba(255,255,255,0.2); display: inline-block; padding: 4px 12px; border-radius: 15px;">...</div>
+    </div>
+
+    <div id="p-home" class="page active">
+        <div class="card" style="background: #e0e7ff; border: none;">
+            <h4 style="margin-top:0">📚 ابدأ جلستك الآن</h4>
+            <div id="subjectsMenu"></div>
+        </div>
+        <div class="card">
+            <h4>🎙️ ديسكورد نوفل</h4>
+            <button class="btn btn-main" onclick="window.open('https://discord.gg/wnkeh6qcM')">دخول السيرفر</button>
+        </div>
+    </div>
+
+    <div id="p-tasks" class="page">
+        <div class="card">
+            <h3>📝 مهام اليوم</h3>
+            <input type="text" id="taskInp" placeholder="ماذا ستفعل اليوم؟">
+            <button class="btn btn-main" onclick="addNewTask()">إضافة وإرسال 📡</button>
+            <div id="todayTasks" style="margin-top:15px;"></div>
+        </div>
+        <div class="card">
+            <h3>📸 الواجبات</h3>
+            <button class="btn btn-main" style="background:var(--success)" onclick="document.getElementById('file').click()">إرسال صورة الحل</button>
+            <input type="file" id="file" style="display:none" onchange="upImg(this)">
+        </div>
+    </div>
+
+    <div id="p-calendar" class="page">
+        <div class="card">
+            <div class="cal-header">
+                <span id="monthYear">جانفي 2026</span>
+            </div>
+            <div class="cal-grid" id="calendarGrid"></div>
+        </div>
+    </div>
+
+    <div id="p-stats" class="page">
+        <div class="card">
+            <h3>📊 التحليل الأسبوعي</h3>
+            <canvas id="statChart" height="200"></canvas>
+        </div>
+        <div class="card" style="text-align: center; background: var(--primary); color: white;">
+            <p>نقاط الإنجاز</p>
+            <h1 id="totalPts">0</h1>
+        </div>
+    </div>
+
+    <div id="dayModal" onclick="this.style.display='none'">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 id="mDate" style="color:var(--primary)"></h3>
+            <hr>
+            <div id="mContent"></div>
+            <button class="btn btn-main" onclick="document.getElementById('dayModal').style.display='none'">إغلاق</button>
+        </div>
+    </div>
+
+    <nav class="nav-bar">
+        <button class="nav-item active" onclick="showP('home', this)">🏠<span>الرئيسية</span></button>
+        <button class="nav-item" onclick="showP('tasks', this)">📝<span>المهام</span></button>
+        <button class="nav-item" onclick="showP('calendar', this)">📅<span>التقويم</span></button>
+        <button class="nav-item" onclick="showP('stats', this)">📊<span>التحليل</span></button>
+    </nav>
+
+    <script>
+        const CFG = { token: "8234205829:AAHi-KMfkHOxsQlTl9R62a0q-ENICHxy76s", chat: "8184681032", pass: "noufel2026" };
+        const subs = [{n:"مادة حفظ", d:90}, {n:"أساسية 1", d:120}, {n:"أساسية 2", d:120}, {n:"مراجعة", d:45}];
+
+        let timer;
+        let isPaused = false;
+
+        window.onload = () => {
+            if(!localStorage.getItem('user')) auth();
+            renderCalendar(); renderSubs(); renderTasks(); updateBac(); initChart();
+            document.getElementById('totalPts').innerText = localStorage.getItem('pts') || 0;
+            if(localStorage.getItem('sess')) openFocus();
+        };
+
+        function auth() {
+            const n = prompt("الاسم:"); const p = prompt("الهاتف:"); const c = prompt("الكود:");
+            if(n && c === CFG.pass) {
+                localStorage.setItem('user', n);
+                sendBot(`✅ دخول طالب: ${n}`);
+            } else location.reload();
+        }
+
+        function showP(id, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('p-'+id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        // --- نظام الدراسة ---
+        function startStudy(n, mins) {
+            const sess = { n, remain: mins * 60, total: mins * 60, date: getToday() };
+            localStorage.setItem('sess', JSON.stringify(sess));
+            sendBot(`🚀 بدأ دراسة: ${localStorage.getItem('user')} | ${n}`);
+            openFocus();
+        }
+
+        function openFocus() {
+            document.getElementById('studyOverlay').style.display = 'flex';
+            const s = JSON.parse(localStorage.getItem('sess'));
+            document.getElementById('currentSubName').innerText = s.n;
+            clearInterval(timer);
+            timer = setInterval(() => {
+                if(!isPaused) {
+                    s.remain--;
+                    localStorage.setItem('sess', JSON.stringify(s));
+                    if(s.remain <= 0) finishSess();
+                    updateClock(s.remain);
+                }
+            }, 1000);
+        }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            document.getElementById('pauseBtn').innerText = isPaused ? "متابعة ▶️" : "إيقاف مؤقت ⏸";
+        }
+
+        function emergencyExit() {
+            isPaused = true; clearInterval(timer);
+            document.getElementById('studyOverlay').style.display = 'none';
+            sendBot(`⚠️ خروج اضطراري: ${localStorage.getItem('user')}`);
+            alert("الحصة معلقة، يمكنك العودة من الرئيسية.");
+        }
+
+        function finishSess() {
+            const s = JSON.parse(localStorage.getItem('sess'));
+            saveToLogs(s.total, s.n);
+            sendBot(`🏆 تم الإنجاز: ${localStorage.getItem('user')} | ${s.n}`);
+            localStorage.removeItem('sess');
+            location.reload();
+        }
+
+        // --- التقويم والتحليل ---
+        function saveToLogs(sec, subName) {
+            const logs = JSON.parse(localStorage.getItem('logs') || "{}");
+            const day = getToday();
+            if(!logs[day]) logs[day] = { hours: 0, subs: [], tasks: [] };
+            logs[day].hours += (sec/3600);
+            logs[day].subs.push(subName);
+            
+            localStorage.setItem('pts', parseInt(localStorage.getItem('pts')||0) + 10);
+            localStorage.setItem('logs', JSON.stringify(logs));
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const logs = JSON.parse(localStorage.getItem('logs') || "{}");
+            grid.innerHTML = "";
+            const days = ["ح", "ن", "ث", "ر", "خ", "ج", "س"];
+            days.forEach(d => grid.innerHTML += `<div class="cal-day-label">${d}</div>`);
+
+            const now = new Date();
+            const start = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
+            const totalDays = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+
+            for(let i=0; i<start; i++) grid.innerHTML += `<div></div>`;
+            for(let d=1; d<=totalDays; d++) {
+                const dateStr = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+                grid.innerHTML += `<div class="cal-date ${logs[dateStr]?'has-data':''}" onclick="showDay('${dateStr}')">${d}</div>`;
+            }
+        }
+
+        function showDay(date) {
+            const logs = JSON.parse(localStorage.getItem('logs') || "{}");
+            const data = logs[date];
+            if(!data) return alert("لا توجد بيانات لهذا اليوم.");
+            
+            document.getElementById('mDate').innerText = `إنجاز يوم ${date}`;
+            document.getElementById('mContent').innerHTML = `
+                <div style="background:#f0f7ff; padding:10px; border-radius:15px; margin-bottom:10px;">
+                    <b>⏱ مدة الدراسة:</b> ${data.hours.toFixed(1)} ساعة
+                </div>
+                <b>📚 المواد:</b><br>${data.subs.map(s => `<span style="color:var(--primary)">• ${s}</span>`).join('<br>')}
+                <br><br>
+                <b>📝 المهام المنجزة:</b><br>${data.tasks.map(t => `<div style="background:#fff3cd; padding:5px; margin:2px; border-radius:5px;">✅ ${t}</div>`).join('') || 'لا توجد مهام'}
+            `;
+            document.getElementById('dayModal').style.display = 'flex';
+        }
+
+        // --- المهام ---
+        function addNewTask() {
+            const v = document.getElementById('taskInp').value; if(!v) return;
+            const logs = JSON.parse(localStorage.getItem('logs') || "{}");
+            const day = getToday();
+            if(!logs[day]) logs[day] = { hours: 0, subs: [], tasks: [] };
+            logs[day].tasks.push(v);
+            localStorage.setItem('logs', JSON.stringify(logs));
+            sendBot(`📝 مهمة من ${localStorage.getItem('user')}: ${v}`);
+            document.getElementById('taskInp').value = ""; renderTasks();
+        }
+
+        function renderTasks() {
+            const logs = JSON.parse(localStorage.getItem('logs') || "{}");
+            const ts = logs[getToday()]?.tasks || [];
+            document.getElementById('todayTasks').innerHTML = ts.map(t => `<div class="card" style="padding:10px; margin-bottom:5px;">✅ ${t}</div>`).join('');
+        }
+
+        // --- أدوات مساعدة ---
+        function getToday() { return new Date().toISOString().split('T')[0]; }
+        function sendBot(m) { fetch(`https://api.telegram.org/bot${CFG.token}/sendMessage`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ chat_id: CFG.chat, text: m }) }); }
+        function updateClock(s) { const m = Math.floor(s/60); const sec = s%60; document.getElementById('mainClock').innerText = `${m}:${sec<10?'0'+sec:sec}`; }
+        function updateBac() { const d = Math.floor((new Date("2026-06-07") - new Date())/86400000); document.getElementById('bacDays').innerText = `بقي ${d} يوم على الحلم 🎓`; }
+        function renderSubs() { const c = document.getElementById('subjectsMenu'); subs.forEach(s => c.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>${s.n}</span><button class="btn btn-main" style="width:auto; margin:0; padding:5px 15px;" onclick="startStudy('${s.n}', ${s.d})">ابدأ</button></div>`); }
+        function initChart() {
+            const logs = JSON.parse(localStorage.getItem('logs') || "{}");
+            const labels = Object.keys(logs).slice(-7);
+            new Chart(document.getElementById('statChart'), { type: 'line', data: { labels, datasets: [{ label: 'ساعات الدراسة', data: labels.map(l => logs[l].hours), borderColor: '#4361ee', fill: true, backgroundColor: 'rgba(67, 97, 238, 0.1)', tension: 0.4 }] }, options: { maintainAspectRatio: false } });
+        }
+    </script>
+</body>
+</html>
