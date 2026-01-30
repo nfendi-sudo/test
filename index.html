@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أكاديمية نوفل 2026 | النظام المتكامل</title>
+    <title>أكاديمية نوفل 2026 | النظام الذكي</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -38,29 +38,29 @@
         }
         .timer-val { font-size: 5rem; font-weight: 900; font-family: monospace; color: white; margin: 20px 0; }
 
-        /* الهيدر */
         .app-header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white; padding: 25px; text-align: center; border-radius: 0 0 40px 40px;
         }
 
-        /* البطاقات */
-        .card { background: white; border-radius: 24px; padding: 20px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        .card { background: white; border-radius: 24px; padding: 20px; margin-bottom: 20px; border: 1px solid #e2e8f0; position: relative; }
         .sub-btn { 
             display: flex; justify-content: space-between; align-items: center; 
             padding: 15px; background: #f8fafc; border-radius: 15px; margin-bottom: 10px; border-right: 5px solid var(--primary);
         }
 
-        /* المودال (البطاقة التفصيلية) */
+        /* تنسيق حذف المهمة */
+        .task-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #f0fdf4; padding: 12px; border-radius: 12px; margin-bottom: 8px; border-right: 4px solid var(--success);
+        }
+        .del-btn { background: #fee2e2; color: #ef4444; border: none; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: bold;}
+
         #dayModal {
             position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 10001;
             display: none; align-items: center; justify-content: center; padding: 20px;
         }
-        .modal-content { 
-            background: white; border-radius: 30px; width: 100%; max-width: 400px; padding: 25px; 
-            position: relative; animation: popUp 0.3s ease;
-        }
-        @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-content { background: white; border-radius: 30px; width: 100%; max-width: 400px; padding: 25px; animation: popUp 0.3s ease; }
 
         .btn { padding: 14px; border-radius: 15px; border: none; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; }
         .btn-main { background: var(--primary); color: white; }
@@ -110,11 +110,11 @@
 
     <div id="p-home" class="page active">
         <div class="card">
-            <h4 style="margin-top:0; color: var(--primary);">📅 برنامجك اليومي</h4>
+            <h4 style="margin-top:0; color: var(--primary);">📅 البرنامج اليومي المرتب</h4>
             <div id="subsMenu"></div>
         </div>
         <div class="card" style="background: #f5f3ff;">
-            <h4 style="margin:0 0 10px 0; color:#5865F2;">🎙️ جلسة ديسكورد المسائية</h4>
+            <h4 style="margin:0 0 10px 0; color:#5865F2;">🎙️ ديسكورد المسائي</h4>
             <button class="btn btn-discord" onclick="window.open('https://discord.gg/wnkeh6qcM')">انضم للبث المباشر</button>
         </div>
     </div>
@@ -135,7 +135,7 @@
 
     <div id="p-calendar" class="page">
         <div class="card">
-            <h3>📅 سجل الإنجازات</h3>
+            <h3 id="monthName">📅 سجل الإنجازات</h3>
             <div class="cal-grid" id="calendarGrid"></div>
         </div>
     </div>
@@ -153,7 +153,7 @@
             <h3 id="mDate" style="color:var(--primary); margin-top:0;"></h3>
             <hr style="border: 1px solid #f1f5f9;">
             <div id="mContent" style="line-height: 1.8;"></div>
-            <button class="btn btn-main" style="margin-top:20px" onclick="document.getElementById('dayModal').style.display='none'">فهمت</button>
+            <button class="btn btn-main" style="margin-top:20px" onclick="document.getElementById('dayModal').style.display='none'">إغلاق</button>
         </div>
     </div>
 
@@ -180,16 +180,10 @@
         let myChart = null;
 
         window.onload = () => {
-            if(localStorage.getItem('user')) {
-                document.getElementById('authOverlay').style.display = 'none';
-            }
+            if(localStorage.getItem('user')) document.getElementById('authOverlay').style.display = 'none';
             renderSubs(); renderCalendar(); renderTasks(); updateBac();
             document.getElementById('totalPts').innerText = localStorage.getItem('pts') || 0;
-            
-            // استعادة الجلسة في حالة الخروج
-            if(localStorage.getItem('sess')) {
-                openFocus(false);
-            }
+            if(localStorage.getItem('sess')) openFocus(false);
         };
 
         function validateAuth() {
@@ -199,10 +193,8 @@
             if(name && phone && code === CFG.pass) {
                 localStorage.setItem('user', name);
                 document.getElementById('authOverlay').style.display = 'none';
-                sendBot(`🆕 طالب جديد انضم:\n👤 ${name}\n📱 ${phone}`);
-            } else {
-                alert("تأكد من البيانات أو كود التفعيل!");
-            }
+                sendBot(`🆕 طالب جديد انضم:\n👤 الاسم: ${name}\n📱 الهاتف: ${phone}`);
+            } else alert("بيانات خاطئة!");
         }
 
         function showP(id, el) {
@@ -217,7 +209,7 @@
         function startStudy(n, mins) {
             const sess = { n, remain: mins * 60, total: mins * 60 };
             localStorage.setItem('sess', JSON.stringify(sess));
-            sendBot(`🚀 بدأ الطالب ${localStorage.getItem('user')} مادة: ${n}`);
+            sendBot(`🚀 بدأ ${localStorage.getItem('user')} مادة: ${n}`);
             openFocus(true);
         }
 
@@ -273,14 +265,18 @@
             location.reload();
         }
 
-        // --- التقويم والبطاقات ---
+        // --- التقويم (تحديث الشهر تلقائياً) ---
         function renderCalendar() {
             const grid = document.getElementById('calendarGrid');
             const logs = JSON.parse(localStorage.getItem('logs') || "{}");
+            const now = new Date();
+            const monthNames = ["جانفي", "فيفري", "مارس", "أفريل", "ماي", "جوان", "جويلية", "أوت", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+            document.getElementById('monthName').innerText = `📅 سجل شهر ${monthNames[now.getMonth()]}`;
+            
             grid.innerHTML = "";
-            const totalDays = new Date(2026, new Date().getMonth()+1, 0).getDate();
+            const totalDays = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
             for(let d=1; d<=totalDays; d++) {
-                const ds = `${new Date().getFullYear()}-${(new Date().getMonth()+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+                const ds = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
                 grid.innerHTML += `<div class="cal-date ${logs[ds]?'has-data':''}" onclick="showDayDetails('${ds}')">${d}</div>`;
             }
         }
@@ -292,19 +288,13 @@
             if(data) {
                 document.getElementById('mContent').innerHTML = `
                     <b>⏱ مدة الدراسة:</b> ${data.hours.toFixed(1)} ساعة<br>
-                    <b>📚 المواد المدروسة:</b><br>${data.subs.map(s => "• " + s).join('<br>')}<br>
-                    <b>📝 المهام المكتملة:</b> ${data.tasks.length} مهام
-                `;
-            } else {
-                document.getElementById('mContent').innerHTML = "لم يتم تسجيل أي نشاط في هذا اليوم.";
-            }
+                    <b>📚 المواد:</b><br>${data.subs.map(s => "• " + s).join('<br>')}<br>
+                    <b>📝 المهام:</b> ${data.tasks.length}`;
+            } else document.getElementById('mContent').innerHTML = "لا يوجد نشاط.";
             document.getElementById('dayModal').style.display = 'flex';
         }
 
-        // --- أدوات عامة ---
-        function getToday() { return new Date().toISOString().split('T')[0]; }
-        function sendBot(m) { fetch(`https://api.telegram.org/bot${CFG.token}/sendMessage`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ chat_id: CFG.chat, text: m }) }); }
-        function updateBac() { const d = Math.floor((new Date("2026-06-07") - new Date())/86400000); document.getElementById('bacDays').innerText = `بقي ${d} يوم على الحلم 🎓`; }
+        // --- المهام (مع ميزة الحذف) ---
         function addNewTask() {
             const v = document.getElementById('taskInp').value; if(!v) return;
             const logs = JSON.parse(localStorage.getItem('logs') || "{}");
@@ -312,13 +302,34 @@
             if(!logs[day]) logs[day] = { hours: 0, subs: [], tasks: [] };
             logs[day].tasks.push(v);
             localStorage.setItem('logs', JSON.stringify(logs));
+            sendBot(`📝 مهمة جديدة من ${localStorage.getItem('user')}: ${v}`);
             renderTasks(); document.getElementById('taskInp').value = "";
         }
+
+        function deleteTask(index) {
+            const logs = JSON.parse(localStorage.getItem('logs') || "{}");
+            const day = getToday();
+            if(logs[day] && logs[day].tasks) {
+                logs[day].tasks.splice(index, 1);
+                localStorage.setItem('logs', JSON.stringify(logs));
+                renderTasks();
+            }
+        }
+
         function renderTasks() {
             const logs = JSON.parse(localStorage.getItem('logs') || "{}");
             const ts = logs[getToday()]?.tasks || [];
-            document.getElementById('todayTasks').innerHTML = ts.map(t => `<div class="sub-btn" style="border-right-color: var(--success)">✅ ${t}</div>`).join('');
+            document.getElementById('todayTasks').innerHTML = ts.map((t, i) => `
+                <div class="task-item">
+                    <span>✅ ${t}</span>
+                    <button class="del-btn" onclick="deleteTask(${i})">حذف</button>
+                </div>`).join('');
         }
+
+        // --- أدوات عامة ---
+        function getToday() { return new Date().toISOString().split('T')[0]; }
+        function sendBot(m) { fetch(`https://api.telegram.org/bot${CFG.token}/sendMessage`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ chat_id: CFG.chat, text: m }) }); }
+        function updateBac() { const d = Math.floor((new Date("2026-06-07") - new Date())/86400000); document.getElementById('bacDays').innerText = `بقي ${d} يوم على البكالوريا 🎓`; }
         function renderSubs() {
             const c = document.getElementById('subsMenu');
             subjects.forEach(s => c.innerHTML += `<div class="sub-btn"><span>${s.n}</span><button class="btn btn-main" style="width:auto; margin:0; padding:5px 15px;" onclick="startStudy('${s.n}', ${s.d})">ابدأ</button></div>`);
