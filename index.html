@@ -5,36 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>أكاديمية نوفل 2026 | النظام الذكي</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6366f1; --secondary: #a855f7; --accent: #f43f5e;
-            --bg: #f8fafc; --card: #ffffff; --text: #1e293b;
-            --success: #10b981; --gold: #f59e0b;
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --success: #22c55e;
+            --dark: #0f172a;
+            --bg: #f8fafc;
         }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; color: var(--dark); overflow-x: hidden; }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text);
-            margin: 0; padding-bottom: 90px; overflow-x: hidden;
-        }
-
-        /* شاشة الدخول */
-        #authOverlay {
-            position: fixed; inset: 0; background: linear-gradient(135deg, var(--primary), var(--secondary));
-            z-index: 20000; display: flex; align-items: center; justify-content: center; padding: 20px;
-        }
-        .auth-card {
-            background: white; padding: 30px; border-radius: 30px; width: 100%; max-width: 350px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2); text-align: center;
-        }
-        .auth-input {
-            width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #f1f5f9;
-            border-radius: 12px; outline: none; font-family: inherit; box-sizing: border-box;
-        }
-
-        /* شاشة الدراسة */
-        #studyOverlay {
-            position: fixed; inset: 0; background: radial-gradient(circle, #1e293b, #0f172a);
-            z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; color: white;
+        /* التوقيت (البومودورو) */
+        #focusOverlay {
+            position: fixed; inset: 0; background: var(--dark); z-index: 10000;
+            display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white;
         }
         .timer-val { font-size: 5rem; font-weight: 900; font-family: monospace; color: white; margin: 20px 0; }
 
@@ -44,12 +30,12 @@
         }
 
         .card { background: white; border-radius: 24px; padding: 20px; margin-bottom: 20px; border: 1px solid #e2e8f0; position: relative; }
+        
         .sub-btn { 
             display: flex; justify-content: space-between; align-items: center; 
             padding: 15px; background: #f8fafc; border-radius: 15px; margin-bottom: 10px; border-right: 5px solid var(--primary);
         }
 
-        /* تنسيق حذف المهمة */
         .task-item {
             display: flex; justify-content: space-between; align-items: center;
             background: #f0fdf4; padding: 12px; border-radius: 12px; margin-bottom: 8px; border-right: 4px solid var(--success);
@@ -61,95 +47,91 @@
             display: none; align-items: center; justify-content: center; padding: 20px;
         }
         .modal-content { background: white; border-radius: 30px; width: 100%; max-width: 400px; padding: 25px; animation: popUp 0.3s ease; }
+        @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         .btn { padding: 14px; border-radius: 15px; border: none; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; }
         .btn-main { background: var(--primary); color: white; }
         .btn-discord { background: #5865F2; color: white; }
 
-        .nav-bar {
-            position: fixed; bottom: 15px; left: 15px; right: 15px; background: rgba(255,255,255,0.95);
-            height: 70px; display: flex; border-radius: 25px; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        .nav-item { flex: 1; border: none; background: none; color: #94a3b8; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.7rem; }
-        .nav-item.active { color: var(--primary); font-weight: bold; }
+        /* التقويم */
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 15px; }
+        .cal-date { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: #f1f5f9; border-radius: 12px; font-weight: bold; font-size: 0.9rem; cursor: pointer; }
+        .cal-date.has-data { background: #dcfce7; color: #166534; border: 2px solid #22c55e; }
 
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-        .cal-date { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: #f1f5f9; border-radius: 12px; cursor: pointer; font-size: 0.85rem; }
-        .cal-date.has-data { background: var(--primary); color: white; font-weight: bold; }
+        /* شريط التنقل السفلي */
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 15px; border-top: 1px solid #e2e8f0; z-index: 1000; }
+        .nav-item { border: none; background: none; color: #94a3b8; font-family: inherit; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
+        .nav-item.active { color: var(--primary); }
 
-        .page { display: none; padding: 20px; }
-        .page.active { display: block; }
+        /* الأوفرلاي الخاص بالدخول */
+        #authOverlay { position: fixed; inset: 0; background: white; z-index: 20000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; }
+        input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #cbd5e1; margin-bottom: 10px; font-family: inherit; font-size: 1rem; }
     </style>
 </head>
 <body>
 
     <div id="authOverlay">
-        <div class="auth-card">
-            <h2 style="color: var(--primary); margin-bottom: 5px;">مرحباً بك 🎓</h2>
-            <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 20px;">سجل دخولك لبدء التفوق</p>
-            <input type="text" id="uName" class="auth-input" placeholder="الاسم الكامل">
-            <input type="tel" id="uPhone" class="auth-input" placeholder="رقم الهاتف">
-            <input type="password" id="uCode" class="auth-input" placeholder="كود التفعيل">
-            <button class="btn btn-main" style="margin-top: 15px;" onclick="validateAuth()">دخول الأكاديمية</button>
+        <h2 style="color: var(--primary);">مرحباً بك في أكاديمية نوفل</h2>
+        <p>يرجى إدخال بياناتك للبدء</p>
+        <input type="text" id="uName" placeholder="الاسم الكامل">
+        <input type="tel" id="uPhone" placeholder="رقم الهاتف">
+        <input type="password" id="uCode" placeholder="كود التفعيل">
+        <button class="btn btn-main" onclick="validateAuth()">تفعيل النظام</button>
+    </div>
+
+    <div id="focusOverlay">
+        <h2 id="focusTitle">جلسة دراسة</h2>
+        <div class="timer-val" id="timer">25:00</div>
+        <button class="btn btn-main" style="width: 200px; background: #ef4444;" onclick="cancelStudy()">إنهاء الجلسة</button>
+    </div>
+
+    <header class="app-header">
+        <h1 style="margin:0; font-size: 1.5rem;">أكاديمية نوفل</h1>
+        <div id="bacDays" style="font-weight: bold; margin-top: 10px; background: rgba(255,255,255,0.2); display: inline-block; padding: 5px 15px; border-radius: 20px;"></div>
+    </header>
+
+    <div class="container" style="padding: 20px;">
+        
+        <div id="p-home" class="page active">
+            <div class="card">
+                <h4 style="margin-top:0; color: var(--primary);">📅 البرنامج اليومي المرتب</h4>
+                <div id="subsMenu"></div>
+            </div>
+            <div class="card" style="background: #f5f3ff;">
+                <h4 style="margin:0 0 10px 0; color:#5865F2;">🎙️ ديسكورد المسائي</h4>
+                <button class="btn btn-discord" onclick="window.open('https://discord.gg/wnkeh6qcM')">انضم للبث المباشر</button>
+            </div>
+        </div>
+
+        <div id="p-tasks" class="page" style="display:none;">
+            <div class="card">
+                <h3>📝 المهام اليومية</h3>
+                <div style="display:flex; gap:10px; margin-bottom:20px;">
+                    <input type="text" id="taskInp" placeholder="أضف مهمة جديدة..." style="margin:0;">
+                    <button class="btn btn-main" style="width:auto; padding:0 20px;" onclick="addNewTask()">+</button>
+                </div>
+                <div id="todayTasks"></div>
+            </div>
+            <div class="card">
+                <h3>📸 إرسال الواجبات</h3>
+                <input type="file" id="photoInp" hidden onchange="uploadPhoto(this)">
+                <button class="btn btn-main" onclick="document.getElementById('photoInp').click()">التقط صورة للواجب</button>
+            </div>
+        </div>
+
+        <div id="p-calendar" class="page" style="display:none;">
+            <div class="card">
+                <h3 id="monthName">📅 سجل الإنجازات</h3>
+                <div class="cal-grid" id="calendarGrid"></div>
+            </div>
+            <div class="card" style="height: 300px;">
+                <canvas id="statChart"></canvas>
+            </div>
         </div>
     </div>
 
-    <div id="studyOverlay">
-        <h2 id="currentSubName">جاري المذاكرة...</h2>
-        <div class="timer-val" id="mainClock">00:00</div>
-        <div style="width: 80%; max-width: 320px; display: flex; flex-direction: column; gap: 12px;">
-            <button class="btn" style="background: var(--gold); color: white;" id="pauseBtn" onclick="togglePause()">إيقاف مؤقت ⏸</button>
-            <button class="btn" style="background: var(--accent); color: white;" onclick="emergencyExit()">خروج واحتفاظ بالوقت 🏃</button>
-        </div>
-    </div>
-
-    <div class="app-header">
-        <h3 style="margin:0">أكاديمية نوفل 2026</h3>
-        <div id="bacDays" style="font-size: 0.8rem; margin-top: 5px; background: rgba(255,255,255,0.2); display: inline-block; padding: 4px 15px; border-radius: 20px;">...</div>
-    </div>
-
-    <div id="p-home" class="page active">
-        <div class="card">
-            <h4 style="margin-top:0; color: var(--primary);">📅 البرنامج اليومي المرتب</h4>
-            <div id="subsMenu"></div>
-        </div>
-        <div class="card" style="background: #f5f3ff;">
-            <h4 style="margin:0 0 10px 0; color:#5865F2;">🎙️ ديسكورد المسائي</h4>
-            <button class="btn btn-discord" onclick="window.open('https://discord.gg/wnkeh6qcM')">انضم للبث المباشر</button>
-        </div>
-    </div>
-
-    <div id="p-tasks" class="page">
-        <div class="card">
-            <h3>📝 المهام والواجبات</h3>
-            <input type="text" id="taskInp" class="auth-input" placeholder="أضف مهمة اليوم...">
-            <button class="btn btn-main" onclick="addNewTask()">إضافة المهمة</button>
-            <div id="todayTasks" style="margin-top:20px;"></div>
-        </div>
-        <div class="card">
-            <h3>📤 إرسال الحل للأستاذ</h3>
-            <button class="btn btn-main" style="background: var(--success);" onclick="document.getElementById('fileInp').click()">تصوير الحل وإرساله</button>
-            <input type="file" id="fileInp" accept="image/*" style="display:none" onchange="uploadPhoto(this)">
-        </div>
-    </div>
-
-    <div id="p-calendar" class="page">
-        <div class="card">
-            <h3 id="monthName">📅 سجل الإنجازات</h3>
-            <div class="cal-grid" id="calendarGrid"></div>
-        </div>
-    </div>
-
-    <div id="p-stats" class="page">
-        <div class="card"><div style="height:250px;"><canvas id="statChart"></canvas></div></div>
-        <div class="card" style="text-align:center; background: var(--primary); color:white;">
-            <p style="margin:0">نقاطك الإجمالية ⭐</p>
-            <h1 id="totalPts" style="margin:5px 0">0</h1>
-        </div>
-    </div>
-
-    <div id="dayModal" onclick="this.style.display='none'">
-        <div class="modal-content" onclick="event.stopPropagation()">
+    <div id="dayModal">
+        <div class="modal-content">
             <h3 id="mDate" style="color:var(--primary); margin-top:0;"></h3>
             <hr style="border: 1px solid #f1f5f9;">
             <div id="mContent" style="line-height: 1.8;"></div>
@@ -158,31 +140,19 @@
     </div>
 
     <nav class="nav-bar">
-        <button class="nav-item active" onclick="showP('home', this)">🏠<span>الرئيسية</span></button>
-        <button class="nav-item" onclick="showP('tasks', this)">📝<span>المهام</span></button>
-        <button class="nav-item" onclick="showP('calendar', this)">📅<span>التقويم</span></button>
-        <button class="nav-item" onclick="showP('stats', this)">📊<span>التحليل</span></button>
+        <button class="nav-item active" onclick="showP('p-home', this)">🏠 الرئيسة</button>
+        <button class="nav-item" onclick="showP('p-tasks', this)">📝 المهام</button>
+        <button class="nav-item" onclick="showP('p-calendar', this)">📈 الإحصائيات</button>
     </nav>
 
     <script>
-        const CFG = { token: "8234205829:AAHi-KMfkHOxsQlTl9R62a0q-ENICHxy76s", chat: "8184681032", pass: "noufel2026" };
-        
-        const subjects = [
-            {n: "مادة حفظ 🧠", d: 90},
-            {n: "مادة أساسية (1) 📚", d: 120},
-            {n: "مادة أساسية (2) 📐", d: 120},
-            {n: "مصطلحات وتواريخ 🗺️", d: 45},
-            {n: "مواد أدبية 📖", d: 90}
-        ];
-
-        let studyTimer;
-        let isPaused = true;
+        const CFG = { token: '7875416049:AAG9GidD9tQyFvFmK6O9L8fI1f3U1R_jT7k', chat: '6614138676', pass: '2026' };
+        const subjects = [{n:'الفرنسية', d:45}, {n:'الإنجليزية', d:45}, {n:'الفلسفة', d:60}, {n:'العربية', d:60}];
         let myChart = null;
 
         window.onload = () => {
             if(localStorage.getItem('user')) document.getElementById('authOverlay').style.display = 'none';
             renderSubs(); renderCalendar(); renderTasks(); updateBac();
-            document.getElementById('totalPts').innerText = localStorage.getItem('pts') || 0;
             if(localStorage.getItem('sess')) openFocus(false);
         };
 
@@ -198,14 +168,13 @@
         }
 
         function showP(id, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('p-'+id).classList.add('active');
+            document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+            document.getElementById(id).style.display = 'block';
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
-            if(id === 'stats') initChart();
+            if(id === 'p-calendar') initChart();
         }
 
-        // --- نظام التايمر ---
         function startStudy(n, mins) {
             const sess = { n, remain: mins * 60, total: mins * 60 };
             localStorage.setItem('sess', JSON.stringify(sess));
@@ -213,59 +182,49 @@
             openFocus(true);
         }
 
-        function openFocus(autoStart) {
-            document.getElementById('studyOverlay').style.display = 'flex';
-            const s = JSON.parse(localStorage.getItem('sess'));
-            document.getElementById('currentSubName').innerText = s.n;
-            updateClockUI(s.remain);
-            if(autoStart) { isPaused = false; document.getElementById('pauseBtn').innerText = "إيقاف مؤقت ⏸"; startInterval(); }
-            else { isPaused = true; document.getElementById('pauseBtn').innerText = "متابعة المذاكرة ▶️"; }
-        }
+        function openFocus(isNew) {
+            const sess = JSON.parse(localStorage.getItem('sess'));
+            document.getElementById('focusOverlay').style.display = 'flex';
+            document.getElementById('focusTitle').innerText = `دراسة: ${sess.n}`;
+            
+            const timerInt = setInterval(() => {
+                const s = JSON.parse(localStorage.getItem('sess'));
+                if(!s) { clearInterval(timerInt); return; }
+                
+                s.remain--;
+                localStorage.setItem('sess', JSON.stringify(s));
+                
+                const m = Math.floor(s.remain / 60);
+                const sec = s.remain % 60;
+                document.getElementById('timer').innerText = `${m}:${sec < 10 ? '0' : ''}${sec}`;
 
-        function startInterval() {
-            clearInterval(studyTimer);
-            studyTimer = setInterval(() => {
-                if(!isPaused) {
-                    let s = JSON.parse(localStorage.getItem('sess'));
-                    s.remain--;
-                    localStorage.setItem('sess', JSON.stringify(s));
-                    updateClockUI(s.remain);
-                    if(s.remain <= 0) finishSess();
+                if(s.remain <= 0) {
+                    clearInterval(timerInt);
+                    finishStudy();
                 }
             }, 1000);
         }
 
-        function togglePause() {
-            isPaused = !isPaused;
-            document.getElementById('pauseBtn').innerText = isPaused ? "متابعة المذاكرة ▶️" : "إيقاف مؤقت ⏸";
-            if(!isPaused) startInterval();
-        }
-
-        function updateClockUI(sec) {
-            const m = Math.floor(sec/60); const s = sec%60;
-            document.getElementById('mainClock').innerText = `${m}:${s<10?'0'+s:s}`;
-        }
-
-        function emergencyExit() {
-            isPaused = true; clearInterval(studyTimer);
-            document.getElementById('studyOverlay').style.display = 'none';
-        }
-
-        function finishSess() {
-            const s = JSON.parse(localStorage.getItem('sess'));
-            const logs = JSON.parse(localStorage.getItem('logs') || "{}");
+        function finishStudy() {
+            const sess = JSON.parse(localStorage.getItem('sess'));
             const day = getToday();
+            const logs = JSON.parse(localStorage.getItem('logs') || "{}");
+            
             if(!logs[day]) logs[day] = { hours: 0, subs: [], tasks: [] };
-            logs[day].hours += (s.total/3600);
-            logs[day].subs.push(s.n);
+            logs[day].hours += sess.total / 3600;
+            if(!logs[day].subs.includes(sess.n)) logs[day].subs.push(sess.n);
+            
             localStorage.setItem('logs', JSON.stringify(logs));
-            localStorage.setItem('pts', parseInt(localStorage.getItem('pts')||0) + 10);
-            sendBot(`🏆 تم بنجاح: ${localStorage.getItem('user')} أنجز ${s.n}`);
+            localStorage.removeItem('sess');
+            sendBot(`✅ أكمل ${localStorage.getItem('user')} دراسة ${sess.n}`);
+            location.reload();
+        }
+
+        function cancelStudy() {
             localStorage.removeItem('sess');
             location.reload();
         }
 
-        // --- التقويم (تحديث الشهر تلقائياً) ---
         function renderCalendar() {
             const grid = document.getElementById('calendarGrid');
             const logs = JSON.parse(localStorage.getItem('logs') || "{}");
@@ -281,20 +240,17 @@
             }
         }
 
-        function showDayDetails(date) {
-            const logs = JSON.parse(localStorage.getItem('logs') || "{}");
-            const data = logs[date];
-            document.getElementById('mDate').innerText = `تقرير يوم: ${date}`;
+        function showDayDetails(ds) {
+            const data = JSON.parse(localStorage.getItem('logs') || "{}")[ds];
+            document.getElementById('mDate').innerText = ds;
             if(data) {
                 document.getElementById('mContent').innerHTML = `
-                    <b>⏱ مدة الدراسة:</b> ${data.hours.toFixed(1)} ساعة<br>
                     <b>📚 المواد:</b><br>${data.subs.map(s => "• " + s).join('<br>')}<br>
                     <b>📝 المهام:</b> ${data.tasks.length}`;
             } else document.getElementById('mContent').innerHTML = "لا يوجد نشاط.";
             document.getElementById('dayModal').style.display = 'flex';
         }
 
-        // --- المهام (مع ميزة الحذف) ---
         function addNewTask() {
             const v = document.getElementById('taskInp').value; if(!v) return;
             const logs = JSON.parse(localStorage.getItem('logs') || "{}");
@@ -326,7 +282,6 @@
                 </div>`).join('');
         }
 
-        // --- أدوات عامة ---
         function getToday() { return new Date().toISOString().split('T')[0]; }
         function sendBot(m) { fetch(`https://api.telegram.org/bot${CFG.token}/sendMessage`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ chat_id: CFG.chat, text: m }) }); }
         function updateBac() { const d = Math.floor((new Date("2026-06-07") - new Date())/86400000); document.getElementById('bacDays').innerText = `بقي ${d} يوم على البكالوريا 🎓`; }
@@ -334,6 +289,7 @@
             const c = document.getElementById('subsMenu');
             subjects.forEach(s => c.innerHTML += `<div class="sub-btn"><span>${s.n}</span><button class="btn btn-main" style="width:auto; margin:0; padding:5px 15px;" onclick="startStudy('${s.n}', ${s.d})">ابدأ</button></div>`);
         }
+
         function initChart() {
             if(myChart) myChart.destroy();
             const logs = JSON.parse(localStorage.getItem('logs') || "{}");
@@ -345,6 +301,7 @@
                 options: { maintainAspectRatio: false }
             });
         }
+
         function uploadPhoto(inp) {
             const fd = new FormData(); fd.append('chat_id', CFG.chat); fd.append('photo', inp.files[0]);
             fd.append('caption', `📸 واجب الطالب: ${localStorage.getItem('user')}`);
