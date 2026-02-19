@@ -3,50 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أكاديمية نوفل 2026 | النظام الذكي</title>
+    <title>أكاديمية نوفل 2026 | النظام الذكي (نسخة رمضان)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6366f1; --secondary: #a855f7; --accent: #f43f5e;
-            --bg: #f8fafc; --card: #ffffff; --text: #1e293b;
-            --success: #10b981; --gold: #f59e0b;
+            /* الألوان الرمضانية الجديدة */
+            --primary: #1e3a8a; /* أزرق ليلي عميق */
+            --secondary: #0f172a; /* كحلي داكن للسماء */
+            --accent: #b91c1c; /* أحمر داكن لأزرار الخروج */
+            --bg: #fdfaf6; /* خلفية كريمية دافئة تريح العين */
+            --card: #ffffff; 
+            --text: #1e293b;
+            --success: #059669; /* أخضر إسلامي */
+            --gold: #d4af37; /* ذهبي رمضاني */
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text);
-            margin: 0; padding-bottom: 90px; overflow-x: hidden;
+            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif; 
+            background: var(--bg); 
+            color: var(--text);
+            margin: 0; 
+            padding-bottom: 90px; 
+            overflow-x: hidden;
         }
 
-        /* شاشة الدخول */
+        /* شاشة الدخول - سماء ليلية رمضانية */
         #authOverlay {
-            position: fixed; inset: 0; background: linear-gradient(135deg, var(--primary), var(--secondary));
+            position: fixed; inset: 0; 
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
             z-index: 20000; display: flex; align-items: center; justify-content: center; padding: 20px;
         }
+        #authOverlay::before {
+            content: ''; position: absolute; inset: 0;
+            background-image: radial-gradient(var(--gold) 1px, transparent 1px);
+            background-size: 30px 30px; opacity: 0.15; pointer-events: none;
+        }
         .auth-card {
-            background: white; padding: 30px; border-radius: 30px; width: 100%; max-width: 350px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2); text-align: center;
+            background: rgba(255, 255, 255, 0.95); padding: 35px 30px; border-radius: 30px; width: 100%; max-width: 350px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4); text-align: center;
+            border: 2px solid var(--gold);
+            position: relative;
         }
         .auth-input {
-            width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #f1f5f9;
+            width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e2e8f0;
             border-radius: 12px; outline: none; font-family: inherit; box-sizing: border-box;
+            background: #f8fafc; transition: 0.3s;
         }
+        .auth-input:focus { border-color: var(--gold); }
 
-        /* شاشة الدراسة */
+        /* شاشة الدراسة - تركيز رمضاني */
         #studyOverlay {
-            position: fixed; inset: 0; background: radial-gradient(circle, #1e293b, #0f172a);
+            position: fixed; inset: 0; 
+            background: radial-gradient(circle, var(--primary), var(--secondary));
             z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; color: white;
         }
-        .timer-val { font-size: 5rem; font-weight: 900; font-family: monospace; color: white; margin: 20px 0; }
-
-        .app-header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white; padding: 25px; text-align: center; border-radius: 0 0 40px 40px;
+        #studyOverlay::after {
+            content: '🌙'; position: absolute; top: 40px; font-size: 4rem; opacity: 0.2;
+        }
+        .timer-val { 
+            font-size: 5rem; font-weight: 900; font-family: monospace; 
+            color: var(--gold); margin: 20px 0; 
+            text-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
         }
 
-        .card { background: white; border-radius: 24px; padding: 20px; margin-bottom: 20px; border: 1px solid #e2e8f0; position: relative; }
+        /* الترويسة العلوية */
+        .app-header {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white; padding: 30px 25px 25px; text-align: center; border-radius: 0 0 40px 40px;
+            position: relative; overflow: hidden;
+            border-bottom: 3px solid var(--gold);
+        }
+        .app-header::before {
+            content: ''; position: absolute; inset: 0;
+            background-image: radial-gradient(var(--gold) 1px, transparent 1px);
+            background-size: 25px 25px; opacity: 0.2; pointer-events: none;
+        }
+
+        /* البطاقات */
+        .card { 
+            background: white; border-radius: 24px; padding: 20px; margin-bottom: 20px; 
+            border: 1px solid #e2e8f0; position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
         .sub-btn { 
             display: flex; justify-content: space-between; align-items: center; 
-            padding: 15px; background: #f8fafc; border-radius: 15px; margin-bottom: 10px; border-right: 5px solid var(--primary);
+            padding: 15px; background: #fdfcf8; border-radius: 15px; margin-bottom: 10px; 
+            border-right: 5px solid var(--gold); border-left: 1px solid #eee; border-top: 1px solid #eee; border-bottom: 1px solid #eee;
         }
 
         /* تنسيق حذف المهمة */
@@ -57,36 +100,44 @@
         .del-btn { background: #fee2e2; color: #ef4444; border: none; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: bold;}
 
         #dayModal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 10001;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10001;
             display: none; align-items: center; justify-content: center; padding: 20px;
         }
-        .modal-content { background: white; border-radius: 30px; width: 100%; max-width: 400px; padding: 25px; animation: popUp 0.3s ease; }
+        .modal-content { background: white; border-radius: 30px; width: 100%; max-width: 400px; padding: 25px; animation: popUp 0.3s ease; border: 2px solid var(--gold); }
+        @keyframes popUp { from {transform: scale(0.9); opacity: 0;} to {transform: scale(1); opacity: 1;} }
 
-        .btn { padding: 14px; border-radius: 15px; border: none; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; }
-        .btn-main { background: var(--primary); color: white; }
+        /* الأزرار */
+        .btn { padding: 14px; border-radius: 15px; border: none; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; font-family: inherit;}
+        .btn-main { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(30, 58, 138, 0.3); }
+        .btn-main:hover { background: var(--secondary); transform: translateY(-2px); }
         .btn-discord { background: #5865F2; color: white; }
 
+        /* شريط التنقل السفلي */
         .nav-bar {
             position: fixed; bottom: 15px; left: 15px; right: 15px; background: rgba(255,255,255,0.95);
             height: 70px; display: flex; border-radius: 25px; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid var(--gold);
         }
-        .nav-item { flex: 1; border: none; background: none; color: #94a3b8; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.7rem; }
+        .nav-item { flex: 1; border: none; background: none; color: #94a3b8; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.75rem; font-family: inherit; }
         .nav-item.active { color: var(--primary); font-weight: bold; }
+        .nav-item span { margin-top: 4px; }
 
+        /* التقويم */
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-        .cal-date { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: #f1f5f9; border-radius: 12px; cursor: pointer; font-size: 0.85rem; }
-        .cal-date.has-data { background: var(--primary); color: white; font-weight: bold; }
+        .cal-date { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: #f1f5f9; border-radius: 12px; cursor: pointer; font-size: 0.85rem; transition: 0.2s;}
+        .cal-date.has-data { background: var(--primary); color: var(--gold); font-weight: bold; border: 1px solid var(--gold); box-shadow: 0 2px 5px rgba(212, 175, 55, 0.3); }
 
         .page { display: none; padding: 20px; }
-        .page.active { display: block; }
+        .page.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(10px);} to {opacity: 1; transform: translateY(0);} }
     </style>
 </head>
 <body>
 
     <div id="authOverlay">
         <div class="auth-card">
-            <h2 style="color: var(--primary); margin-bottom: 5px;">مرحباً بك 🎓</h2>
-            <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 20px;">سجل دخولك لبدء التفوق</p>
+            <h2 style="color: var(--primary); margin-bottom: 5px;">رمضان مبارك 🌙</h2>
+            <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 20px; font-weight: 600;">سجل دخولك لبدء التفوق</p>
             <input type="text" id="uName" class="auth-input" placeholder="الاسم الكامل">
             <input type="tel" id="uPhone" class="auth-input" placeholder="رقم الهاتف">
             <input type="password" id="uCode" class="auth-input" placeholder="كود التفعيل">
@@ -95,25 +146,25 @@
     </div>
 
     <div id="studyOverlay">
-        <h2 id="currentSubName">جاري المذاكرة...</h2>
-        <div class="timer-val" id="mainClock">00:00</div>
-        <div style="width: 80%; max-width: 320px; display: flex; flex-direction: column; gap: 12px;">
-            <button class="btn" style="background: var(--gold); color: white;" id="pauseBtn" onclick="togglePause()">إيقاف مؤقت ⏸</button>
+        <h2 id="currentSubName" style="color: white; z-index: 2;">جاري المذاكرة...</h2>
+        <div class="timer-val" id="mainClock" style="z-index: 2;">00:00</div>
+        <div style="width: 80%; max-width: 320px; display: flex; flex-direction: column; gap: 12px; z-index: 2;">
+            <button class="btn" style="background: var(--gold); color: var(--secondary); font-size: 1.1rem;" id="pauseBtn" onclick="togglePause()">إيقاف مؤقت ⏸</button>
             <button class="btn" style="background: var(--accent); color: white;" onclick="emergencyExit()">خروج واحتفاظ بالوقت 🏃</button>
         </div>
     </div>
 
     <div class="app-header">
-        <h3 style="margin:0">أكاديمية نوفل 2026</h3>
-        <div id="bacDays" style="font-size: 0.8rem; margin-top: 5px; background: rgba(255,255,255,0.2); display: inline-block; padding: 4px 15px; border-radius: 20px;">...</div>
+        <h2 style="margin:0; position: relative; z-index: 2; font-weight: 800; color: var(--gold);">✨ أكاديمية نوفل 2026 ✨</h2>
+        <div id="bacDays" style="font-size: 0.9rem; font-weight: bold; margin-top: 8px; background: rgba(255,255,255,0.15); display: inline-block; padding: 6px 20px; border-radius: 20px; position: relative; z-index: 2; border: 1px solid rgba(212, 175, 55, 0.3);">...</div>
     </div>
 
     <div id="p-home" class="page active">
         <div class="card">
-            <h4 style="margin-top:0; color: var(--primary);">📅 البرنامج اليومي المرتب</h4>
+            <h4 style="margin-top:0; color: var(--primary);">🏮 البرنامج اليومي المرتب</h4>
             <div id="subsMenu"></div>
         </div>
-        <div class="card" style="background: #f5f3ff;">
+        <div class="card" style="background: #f5f3ff; border-color: #ddd6fe;">
             <h4 style="margin:0 0 10px 0; color:#5865F2;">🎙️ ديسكورد المسائي</h4>
             <button class="btn btn-discord" onclick="window.open('https://discord.gg/wnkeh6qcM')">انضم للبث المباشر</button>
         </div>
@@ -121,13 +172,13 @@
 
     <div id="p-tasks" class="page">
         <div class="card">
-            <h3>📝 المهام والواجبات</h3>
+            <h3 style="color: var(--primary);">📝 المهام والواجبات</h3>
             <input type="text" id="taskInp" class="auth-input" placeholder="أضف مهمة اليوم...">
             <button class="btn btn-main" onclick="addNewTask()">إضافة المهمة</button>
             <div id="todayTasks" style="margin-top:20px;"></div>
         </div>
         <div class="card">
-            <h3>📤 إرسال الحل للأستاذ</h3>
+            <h3 style="color: var(--primary);">📤 إرسال الحل للأستاذ</h3>
             <button class="btn btn-main" style="background: var(--success);" onclick="document.getElementById('fileInp').click()">تصوير الحل وإرساله</button>
             <input type="file" id="fileInp" accept="image/*" style="display:none" onchange="uploadPhoto(this)">
         </div>
@@ -135,16 +186,16 @@
 
     <div id="p-calendar" class="page">
         <div class="card">
-            <h3 id="monthName">📅 سجل الإنجازات</h3>
+            <h3 id="monthName" style="color: var(--primary);">📅 سجل الإنجازات</h3>
             <div class="cal-grid" id="calendarGrid"></div>
         </div>
     </div>
 
     <div id="p-stats" class="page">
         <div class="card"><div style="height:250px;"><canvas id="statChart"></canvas></div></div>
-        <div class="card" style="text-align:center; background: var(--primary); color:white;">
-            <p style="margin:0">نقاطك الإجمالية ⭐</p>
-            <h1 id="totalPts" style="margin:5px 0">0</h1>
+        <div class="card" style="text-align:center; background: linear-gradient(135deg, var(--primary), var(--secondary)); color:white; border: 2px solid var(--gold);">
+            <p style="margin:0; font-size: 1.1rem;">نقاطك الإجمالية ⭐</p>
+            <h1 id="totalPts" style="margin:5px 0; color: var(--gold); font-size: 3rem; text-shadow: 0 0 15px rgba(212,175,55,0.4);">0</h1>
         </div>
     </div>
 
@@ -152,7 +203,7 @@
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3 id="mDate" style="color:var(--primary); margin-top:0;"></h3>
             <hr style="border: 1px solid #f1f5f9;">
-            <div id="mContent" style="line-height: 1.8;"></div>
+            <div id="mContent" style="line-height: 1.8; font-size: 1.05rem;"></div>
             <button class="btn btn-main" style="margin-top:20px" onclick="document.getElementById('dayModal').style.display='none'">إغلاق</button>
         </div>
     </div>
@@ -341,7 +392,7 @@
             const ctx = document.getElementById('statChart').getContext('2d');
             myChart = new Chart(ctx, {
                 type: 'line',
-                data: { labels, datasets: [{ label: 'ساعات الدراسة', data: labels.map(l => logs[l].hours), borderColor: '#6366f1', tension: 0.4, fill: true, backgroundColor: 'rgba(99, 102, 241, 0.1)' }] },
+                data: { labels, datasets: [{ label: 'ساعات الدراسة', data: labels.map(l => logs[l].hours), borderColor: '#1e3a8a', tension: 0.4, fill: true, backgroundColor: 'rgba(30, 58, 138, 0.1)' }] },
                 options: { maintainAspectRatio: false }
             });
         }
