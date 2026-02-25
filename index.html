@@ -5,18 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>أكاديمية نوفل 2026 | النظام الذكي (نسخة رمضان)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* الألوان الرمضانية الجديدة */
-            --primary: #1e3a8a; /* أزرق ليلي عميق */
-            --secondary: #0f172a; /* كحلي داكن للسماء */
-            --accent: #b91c1c; /* أحمر داكن لأزرار الخروج */
-            --bg: #fdfaf6; /* خلفية كريمية دافئة تريح العين */
+            --primary: #1e3a8a; 
+            --secondary: #0f172a; 
+            --accent: #b91c1c; 
+            --bg: #fdfaf6; 
             --card: #ffffff; 
             --text: #1e293b;
-            --success: #059669; /* أخضر إسلامي */
-            --gold: #d4af37; /* ذهبي رمضاني */
+            --success: #059669; 
+            --gold: #d4af37; 
         }
 
         body {
@@ -28,7 +27,6 @@
             overflow-x: hidden;
         }
 
-        /* شاشة الدخول - سماء ليلية رمضانية */
         #authOverlay {
             position: fixed; inset: 0; 
             background: linear-gradient(135deg, var(--secondary), var(--primary));
@@ -48,11 +46,10 @@
         .auth-input {
             width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e2e8f0;
             border-radius: 12px; outline: none; font-family: inherit; box-sizing: border-box;
-            background: #f8fafc; transition: 0.3s;
+            background: #f8fafc; transition: 0.3s; font-size: 1rem;
         }
         .auth-input:focus { border-color: var(--gold); }
 
-        /* شاشة الدراسة - تركيز رمضاني */
         #studyOverlay {
             position: fixed; inset: 0; 
             background: radial-gradient(circle, var(--primary), var(--secondary));
@@ -67,7 +64,6 @@
             text-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
         }
 
-        /* الترويسة العلوية */
         .app-header {
             background: linear-gradient(135deg, var(--secondary), var(--primary));
             color: white; padding: 30px 25px 25px; text-align: center; border-radius: 0 0 40px 40px;
@@ -80,7 +76,6 @@
             background-size: 25px 25px; opacity: 0.2; pointer-events: none;
         }
 
-        /* البطاقات */
         .card { 
             background: white; border-radius: 24px; padding: 20px; margin-bottom: 20px; 
             border: 1px solid #e2e8f0; position: relative;
@@ -92,12 +87,47 @@
             border-right: 5px solid var(--gold); border-left: 1px solid #eee; border-top: 1px solid #eee; border-bottom: 1px solid #eee;
         }
 
-        /* تنسيق حذف المهمة */
         .task-item {
             display: flex; justify-content: space-between; align-items: center;
             background: #f0fdf4; padding: 12px; border-radius: 12px; margin-bottom: 8px; border-right: 4px solid var(--success);
         }
         .del-btn { background: #fee2e2; color: #ef4444; border: none; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: bold;}
+
+        details {
+            background: #f8fafc; padding: 12px 15px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        summary { font-weight: bold; cursor: pointer; color: var(--primary); outline: none; font-size: 1.1rem; }
+        details p { font-family: 'Amiri', serif; font-size: 1.15rem; line-height: 2; color: #1e293b; margin-top: 15px; margin-bottom: 0; padding-top: 10px; border-top: 1px dashed #cbd5e1; }
+
+        .prayer-box {
+            background: rgba(212, 175, 55, 0.1); border: 2px dashed var(--gold); border-radius: 15px; padding: 20px; text-align: center; margin-top: 25px;
+            box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);
+        }
+
+        #quranContainer {
+            background: #fff;
+            border: 2px solid var(--gold);
+            border-radius: 15px;
+            padding: 20px;
+            max-height: 60vh;
+            overflow-y: auto;
+            margin-top: 15px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+        #quranText {
+            font-family: 'Amiri', serif;
+            font-size: 1.5rem;
+            line-height: 2.2;
+            text-align: justify;
+            color: #1e293b;
+        }
+        .ayah-num {
+            color: var(--gold);
+            font-size: 1.2rem;
+            margin: 0 5px;
+            user-select: none;
+        }
 
         #dayModal {
             position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10001;
@@ -106,23 +136,21 @@
         .modal-content { background: white; border-radius: 30px; width: 100%; max-width: 400px; padding: 25px; animation: popUp 0.3s ease; border: 2px solid var(--gold); }
         @keyframes popUp { from {transform: scale(0.9); opacity: 0;} to {transform: scale(1); opacity: 1;} }
 
-        /* الأزرار */
         .btn { padding: 14px; border-radius: 15px; border: none; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; font-family: inherit;}
         .btn-main { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(30, 58, 138, 0.3); }
         .btn-main:hover { background: var(--secondary); transform: translateY(-2px); }
         .btn-discord { background: #5865F2; color: white; }
 
-        /* شريط التنقل السفلي */
         .nav-bar {
-            position: fixed; bottom: 15px; left: 15px; right: 15px; background: rgba(255,255,255,0.95);
+            position: fixed; bottom: 10px; left: 10px; right: 10px; background: rgba(255,255,255,0.95);
             height: 70px; display: flex; border-radius: 25px; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 1px solid var(--gold);
+            border: 1px solid var(--gold); overflow-x: auto;
         }
-        .nav-item { flex: 1; border: none; background: none; color: #94a3b8; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.75rem; font-family: inherit; }
-        .nav-item.active { color: var(--primary); font-weight: bold; }
+        .nav-item { flex: 1; min-width: 55px; border: none; background: none; color: #94a3b8; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.65rem; font-family: inherit; transition: 0.3s;}
+        .nav-item.active { color: var(--primary); font-weight: bold; transform: scale(1.05); }
         .nav-item span { margin-top: 4px; }
+        .nav-item i { font-size: 1.2rem; font-style: normal; }
 
-        /* التقويم */
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
         .cal-date { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: #f1f5f9; border-radius: 12px; cursor: pointer; font-size: 0.85rem; transition: 0.2s;}
         .cal-date.has-data { background: var(--primary); color: var(--gold); font-weight: bold; border: 1px solid var(--gold); box-shadow: 0 2px 5px rgba(212, 175, 55, 0.3); }
@@ -184,6 +212,94 @@
         </div>
     </div>
 
+    <div id="p-ramadan" class="page">
+        
+        <div class="card">
+            <h3 style="color: var(--primary); text-align: center; margin: 10px 0;">📖 المصحف الشريف</h3>
+            <p style="text-align: center; font-size: 0.85rem; color: #64748b; margin-top: 0;">اختر السورة لتبدأ القراءة مباشرة</p>
+            
+            <select id="surahSelect" class="auth-input" style="font-weight: bold; font-size: 1.1rem; color: var(--primary);" onchange="fetchSurah()">
+                </select>
+            
+            <div id="quranContainer">
+                <div id="quranLoader" style="display:none; text-align:center; color: var(--gold); font-weight: bold;">جاري تحميل الآيات... ⏳</div>
+                <div id="quranText"></div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn btn-main" style="background: var(--success);" onclick="saveQuranBookmark()">حفظ مكان التلاوة 💾</button>
+            </div>
+            <p id="quranSavedMsg" style="color: var(--success); font-size:0.9rem; font-weight: bold; margin-top: 10px; display: none; text-align:center;">تم حفظ وردك بنجاح! تقبل الله 🤲</p>
+        </div>
+
+        <div class="card">
+            <h3 style="color: var(--primary); text-align: center; margin-bottom: 20px;">📿 موسوعة الأذكار والأدعية</h3>
+            
+            <details>
+                <summary>☀️ أذكار الصباح كاملة</summary>
+                <p>
+                    • قراءة آية الكرسي (مرة واحدة).<br>
+                    • قراءة سورة الإخلاص والمعوذتين (3 مرات).<br>
+                    • "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ لا إِلَهَ إِلا اللَّهُ، وَحْدَهُ لا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ."<br>
+                    • "اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ."<br>
+                    • سيد الاستغفار: "اللَّهُمَّ أَنْتَ رَبِّي لا إِلَهَ إِلا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ لَكَ بِذَنْبِي فَاغْفِرْ لِي، فَإِنَّهُ لا يَغْفِرُ الذُّنُوبَ إِلا أَنْتَ."<br>
+                    • "بِسْمِ اللَّهِ الَّذِي لاَ يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الأَرْضِ وَلاَ فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ" (3 مرات).<br>
+                    • "رَضِيتُ بِاللَّهِ رَبًّا، وَبِالإِسْلامِ دِينًا، وَبِمُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ نَبِيًّا" (3 مرات).
+                </p>
+            </details>
+            
+            <details>
+                <summary>🌙 أذكار المساء كاملة</summary>
+                <p>
+                    • قراءة آية الكرسي والمعوذتين (3 مرات).<br>
+                    • "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ لا إِلَهَ إِلا اللَّهُ، وَحْدَهُ لا شَرِيكَ لَهُ."<br>
+                    • "اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصِيرُ."<br>
+                    • "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَافِيَةَ فِي الدُّنْيَا وَالآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي دِينِي وَدُنْيَايَ وَأَهْلِي وَمَالِي."<br>
+                    • "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ، أَصْلِحْ لِي شَأْنِي كُلَّهُ، وَلاَ تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ."
+                </p>
+            </details>
+
+            <details>
+                <summary>💤 أذكار النوم</summary>
+                <p>
+                    • يجمع كفيه وينفث فيهما ويقرأ (الإخلاص، الفلق، الناس) ثم يمسح بهما ما استطاع من جسده (3 مرات).<br>
+                    • قراءة آية الكرسي.<br>
+                    • قراءة خواتيم سورة البقرة (الآيتان 285 و 286).<br>
+                    • "بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ، فَإِنْ أَمْسَكْتَ نَفْسِي فَارْحَمْهَا، وَإِنْ أَرْسَلْتَهَا فَاحْفَظْهَا بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ."<br>
+                    • "اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا."
+                </p>
+            </details>
+            
+            <details>
+                <summary>📚 أدعية المذاكرة والامتحانات</summary>
+                <p>
+                    • قبل المذاكرة: "اللهم إني أسألك فهم النبيين، وحفظ المرسلين، والملائكة المقربين، اللهم اجعل ألسنتنا عامرة بذكرك، وقلوبنا بخشيتك، وأسرارنا بطاعتك."<br>
+                    • بعد المذاكرة: "اللهم إني أستودعك ما قرأت وما حفظت وما تعلمت، فرده عند حاجتي إليه، إنك على كل شيء قدير."<br>
+                    • عند النسيان: "اللهم يا جامع الناس ليوم لا ريب فيه، اجمع علي ضالتي."<br>
+                    • عند التوجه للامتحان: "اللهم لا سهل إلا ما جعلته سهلاً، وأنت تجعل الحَزْنَ إذا شئت سهلاً، ربي اشرح لي صدري ويسر لي أمري واحلل عقدة من لساني يفقهوا قولي."
+                </p>
+            </details>
+
+            <div class="prayer-box">
+                <h4 style="margin: 0; color: var(--accent); font-size: 1.3rem;">🤲 دعوة من القلب</h4>
+                <p style="margin: 10px 0 0 0; font-size: 1.15rem; font-weight: bold; color: #1e293b; line-height: 1.8;">
+                    فضلاً وليس أمراً إخوتي الطلبة..<br>
+                    <span style="color: var(--primary);">ادعوا لجدتي بالرحمة والمغفرة</span><br>
+                    اللهم اغفر لها وارحمها، وعافها واعف عنها، وأكرم نزلها، ووسع مدخلها، واغسلها بالماء والثلج والبرد، واجعل قبرها روضة من رياض الجنة يارب العالمين.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div id="p-consult" class="page">
+        <div class="card">
+            <h3 style="color: var(--primary); text-align: center;">💬 استشر الأستاذ نوفل</h3>
+            <p style="color: #64748b; font-size: 0.95rem; line-height: 1.6; text-align: center;">هل تعاني من مشكلة في المذاكرة؟ تحتاج نصيحة حول المنهجية أو تنظيم الوقت؟ اكتب سؤالك هنا وسيجيبك الأستاذ نوفل شخصياً.</p>
+            <textarea id="consultMsg" class="auth-input" style="height: 140px; resize: none; font-size: 1rem;" placeholder="اكتب سؤالك، مشكلتك، أو استفسارك هنا بكل أريحية..."></textarea>
+            <button class="btn btn-main" style="margin-top: 10px;" onclick="sendConsult()">إرسال الاستشارة 🚀</button>
+        </div>
+    </div>
+
     <div id="p-calendar" class="page">
         <div class="card">
             <h3 id="monthName" style="color: var(--primary);">📅 سجل الإنجازات</h3>
@@ -209,14 +325,17 @@
     </div>
 
     <nav class="nav-bar">
-        <button class="nav-item active" onclick="showP('home', this)">🏠<span>الرئيسية</span></button>
-        <button class="nav-item" onclick="showP('tasks', this)">📝<span>المهام</span></button>
-        <button class="nav-item" onclick="showP('calendar', this)">📅<span>التقويم</span></button>
-        <button class="nav-item" onclick="showP('stats', this)">📊<span>التحليل</span></button>
+        <button class="nav-item active" onclick="showP('home', this)"><i>🏠</i><span>الرئيسية</span></button>
+        <button class="nav-item" onclick="showP('tasks', this)"><i>📝</i><span>المهام</span></button>
+        <button class="nav-item" onclick="showP('ramadan', this)"><i>🌙</i><span>إيمانيات</span></button>
+        <button class="nav-item" onclick="showP('consult', this)"><i>💬</i><span>استشرني</span></button>
+        <button class="nav-item" onclick="showP('calendar', this)"><i>📅</i><span>التقويم</span></button>
+        <button class="nav-item" onclick="showP('stats', this)"><i>📊</i><span>التحليل</span></button>
     </nav>
 
     <script>
-        const CFG = { token: "8234205829:AAHi-KMfkHOxsQlTl9R62a0q-ENICHxy76s", chat: "8184681032", pass: "noufel2026" };
+        // التوكن ومعرف الدردشة الخاصين بك تم تحديثهما هنا:
+        const CFG = { token: "8234205829:AAG3qcw6lZbhAS5s90P1lAS5DgT6uwcdFtM", chat: "8184681032", pass: "noufel2026" };
         
         const subjects = [
             {n: "مادة حفظ 🧠", d: 90},
@@ -226,16 +345,72 @@
             {n: "مواد أدبية 📖", d: 90}
         ];
 
+        // قائمة سور القرآن الكريم
+        const surahNames = ["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الحشر","الممتحنة","الصف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الحاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس","التكوير","الانفطار","المطففين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","العصر","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"];
+
         let studyTimer;
         let isPaused = true;
         let myChart = null;
 
         window.onload = () => {
             if(localStorage.getItem('user')) document.getElementById('authOverlay').style.display = 'none';
-            renderSubs(); renderCalendar(); renderTasks(); updateBac();
+            renderSubs(); renderCalendar(); renderTasks(); updateBac(); initQuranSelector();
             document.getElementById('totalPts').innerText = localStorage.getItem('pts') || 0;
             if(localStorage.getItem('sess')) openFocus(false);
         };
+
+        function initQuranSelector() {
+            const select = document.getElementById('surahSelect');
+            surahNames.forEach((name, i) => {
+                let opt = document.createElement('option');
+                opt.value = i + 1;
+                opt.innerText = `${i + 1} - سورة ${name}`;
+                select.appendChild(opt);
+            });
+            const savedSurah = localStorage.getItem('quranWirdSurah') || 1;
+            select.value = savedSurah;
+            fetchSurah();
+        }
+
+        async function fetchSurah() {
+            const num = document.getElementById('surahSelect').value;
+            const container = document.getElementById('quranText');
+            document.getElementById('quranLoader').style.display = 'block';
+            container.innerHTML = '';
+            
+            try {
+                const res = await fetch(`https://api.alquran.cloud/v1/surah/${num}`);
+                const data = await res.json();
+                let textHTML = '';
+                
+                if(num != 1 && num != 9) {
+                    textHTML += '<div style="text-align:center; font-weight:bold; color:var(--primary); margin-bottom:15px; font-size:1.6rem;">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>';
+                }
+                
+                data.data.ayahs.forEach(ayah => {
+                    let text = ayah.text;
+                    if (num != 1 && text.startsWith('بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ')) {
+                        text = text.replace('بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ', '');
+                    }
+                    textHTML += `<span>${text} <span class="ayah-num">﴿${ayah.numberInSurah}﴾</span> </span>`;
+                });
+                
+                container.innerHTML = textHTML;
+            } catch (err) {
+                container.innerHTML = '<div style="color:red; text-align:center; font-size:1.2rem;">حدث خطأ في تحميل السورة. يرجى التحقق من اتصالك بالإنترنت.</div>';
+            } finally {
+                document.getElementById('quranLoader').style.display = 'none';
+                document.getElementById('quranContainer').scrollTop = 0;
+            }
+        }
+
+        function saveQuranBookmark() {
+            const num = document.getElementById('surahSelect').value;
+            localStorage.setItem('quranWirdSurah', num);
+            const msg = document.getElementById('quranSavedMsg');
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 3500);
+        }
 
         function validateAuth() {
             const name = document.getElementById('uName').value;
@@ -245,7 +420,7 @@
                 localStorage.setItem('user', name);
                 document.getElementById('authOverlay').style.display = 'none';
                 sendBot(`🆕 طالب جديد انضم:\n👤 الاسم: ${name}\n📱 الهاتف: ${phone}`);
-            } else alert("بيانات خاطئة!");
+            } else alert("بيانات الدخول خاطئة!");
         }
 
         function showP(id, el) {
@@ -256,7 +431,6 @@
             if(id === 'stats') initChart();
         }
 
-        // --- نظام التايمر ---
         function startStudy(n, mins) {
             const sess = { n, remain: mins * 60, total: mins * 60 };
             localStorage.setItem('sess', JSON.stringify(sess));
@@ -316,7 +490,6 @@
             location.reload();
         }
 
-        // --- التقويم (تحديث الشهر تلقائياً) ---
         function renderCalendar() {
             const grid = document.getElementById('calendarGrid');
             const logs = JSON.parse(localStorage.getItem('logs') || "{}");
@@ -345,7 +518,6 @@
             document.getElementById('dayModal').style.display = 'flex';
         }
 
-        // --- المهام (مع ميزة الحذف) ---
         function addNewTask() {
             const v = document.getElementById('taskInp').value; if(!v) return;
             const logs = JSON.parse(localStorage.getItem('logs') || "{}");
@@ -377,9 +549,39 @@
                 </div>`).join('');
         }
 
-        // --- أدوات عامة ---
+        function sendConsult() {
+            const msg = document.getElementById('consultMsg').value;
+            if(!msg.trim()) { alert("الرجاء كتابة استشارتك أولاً!"); return; }
+            const user = localStorage.getItem('user') || 'طالب مجهول';
+            sendBot(`💬 استشارة جديدة من: ${user}\n\n📝 السؤال: ${msg}`);
+            
+            // تم تغيير دالة التنبيه لتعرض لك رسالة نجاح واضحة
+            alert("تم إرسال استشارتك للأستاذ نوفل بنجاح! سيتم الرد عليك قريباً.");
+            document.getElementById('consultMsg').value = '';
+        }
+
         function getToday() { return new Date().toISOString().split('T')[0]; }
-        function sendBot(m) { fetch(`https://api.telegram.org/bot${CFG.token}/sendMessage`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ chat_id: CFG.chat, text: m }) }); }
+
+        // تم تحديث الدالة مع نظام كشف الأخطاء كما شرحت لك
+        function sendBot(m) { 
+            fetch(`https://api.telegram.org/bot${CFG.token}/sendMessage`, { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify({ chat_id: CFG.chat, text: m }) 
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.ok) {
+                    console.error("خطأ من تيليجرام:", data);
+                    alert("⚠️ عذراً، لم تصل الرسالة لتيليجرام. السبب: " + data.description);
+                }
+            })
+            .catch(error => {
+                console.error("مشكلة في الاتصال:", error);
+                // لا نظهر alert هنا للمهام العادية حتى لا نزعج الطالب إن انقطع نت
+            });
+        }
+
         function updateBac() { const d = Math.floor((new Date("2026-06-07") - new Date())/86400000); document.getElementById('bacDays').innerText = `بقي ${d} يوم على البكالوريا 🎓`; }
         function renderSubs() {
             const c = document.getElementById('subsMenu');
@@ -396,10 +598,35 @@
                 options: { maintainAspectRatio: false }
             });
         }
+
+        // تم تحديث دالة إرسال الصورة أيضاً مع رسائل التحقق
         function uploadPhoto(inp) {
-            const fd = new FormData(); fd.append('chat_id', CFG.chat); fd.append('photo', inp.files[0]);
-            fd.append('caption', `📸 واجب الطالب: ${localStorage.getItem('user')}`);
-            fetch(`https://api.telegram.org/bot${CFG.token}/sendPhoto`, { method: 'POST', body: fd }).then(() => alert("تم الإرسال!"));
+            if (!inp.files || inp.files.length === 0) return;
+            
+            const loadingMsg = document.createElement("div");
+            loadingMsg.innerText = "جاري إرسال الصورة لتيليجرام... ⏳";
+            loadingMsg.style = "position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--gold); color:#000; padding:10px 20px; border-radius:10px; z-index:9999; font-weight:bold;";
+            document.body.appendChild(loadingMsg);
+
+            const fd = new FormData(); 
+            fd.append('chat_id', CFG.chat); 
+            fd.append('photo', inp.files[0]);
+            fd.append('caption', `📸 واجب الطالب: ${localStorage.getItem('user') || 'غير معروف'}`);
+            
+            fetch(`https://api.telegram.org/bot${CFG.token}/sendPhoto`, { method: 'POST', body: fd })
+            .then(response => response.json())
+            .then(data => {
+                document.body.removeChild(loadingMsg);
+                if (data.ok) {
+                    alert("✅ تم إرسال الحل للأستاذ بنجاح!");
+                } else {
+                    alert("⚠️ فشل الإرسال! السبب: " + data.description);
+                }
+            })
+            .catch(error => {
+                document.body.removeChild(loadingMsg);
+                alert("⚠️ حدث خطأ أثناء إرسال الصورة. تأكد من جودة الإنترنت.");
+            });
         }
     </script>
 </body>
